@@ -13,9 +13,7 @@ func newClient() (*docker.Client, error) {
 	case "darwin":
 		return docker.NewClientFromEnv()
 	case "linux":
-		dockerEndpoint := flag.String("e", "unix:///var/run/docker.sock", "Docker endpoint")
-		flag.Parse()
-		return docker.NewClient(*dockerEndpoint)
+		return docker.NewClient("unix:///var/run/docker.sock")
 	}
 
 	return nil, errors.New("Can't create docker client")
