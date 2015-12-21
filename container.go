@@ -7,7 +7,6 @@ type(
 		Key    string `json:"key"`
 		Branch string `json:"branch"`
 		Image  string `json:"image"`
-		ID     string `json:"id"`
 	}
 )
 
@@ -41,7 +40,7 @@ func (container Container) Run(dockerClient *docker.Client) error {
 
 func (container Container) Remove(dockerClient *docker.Client) error {
 	removeOpts := docker.RemoveContainerOptions {
-		ID: container.ID,
+		ID: container.Branch,
 		Force: true,
 	}
 
