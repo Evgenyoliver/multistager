@@ -9,8 +9,6 @@ type(
 		Image  string `json:"image"`
 		ID     string `json:"id"`
 	}
-
-	ContainersList []Container
 )
 
 func (container Container) Run(dockerClient *docker.Client) error {
@@ -22,6 +20,9 @@ func (container Container) Run(dockerClient *docker.Client) error {
 				"KEY=" + container.Key,
 			},
 			Image: container.Image,
+		},
+		HostConfig: &docker.HostConfig{
+			PublishAllPorts: true,
 		},
 	}
 
@@ -47,6 +48,18 @@ func (container Container) Remove(dockerClient *docker.Client) error {
 	return dockerClient.RemoveContainer(removeOpts)
 }
 
-func (container Container) List(dockerClient *docker.Client) (ContainersList, error) {
-	return ContainersList{}, nil
+func (container Container) List(dockerClient *docker.Client) ([]docker.APIContainers, error) {
+	apiContainers, err := dockerClient.ListContainers(docker.ListContainersOptions{})
+	if err != nil {
+		return apiContainers, err
+	}
+
+	for id, cont := range apiContainers {
+		if cont.Image != container.Image {
+			apiContainers[id] = apiContainers[len(apiContainers)-1]
+			apiContainers = apiContainers[:len(apiContainers)-1]
+		}
+	}
+
+	return apiContainers, nil
 }

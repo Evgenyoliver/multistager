@@ -13,4 +13,4 @@ RUN go get -d -v
 RUN go build -o multistager
 EXPOSE 8080
 
-CMD ["./multistager"]
+CMD ["./multistager", "-e", "unix:///var/run/docker.sock"]

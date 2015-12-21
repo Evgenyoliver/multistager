@@ -36,7 +36,7 @@ func containerHandler(w http.ResponseWriter, r *http.Request) {
 		case "GET":
 			containersList, err := container.List(dockerClient)
 			if err != nil {
-				http.Error(w, "Failed to start container", http.StatusBadRequest)
+				http.Error(w, "Failed to get containers list", http.StatusBadRequest)
 				return
 			}
 
@@ -44,12 +44,6 @@ func containerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		case "POST":
-			// container := Container {
-			// 	Key: "493b505e15c1df09543a1c8c2be8ee72f158050d",
-			// 	Branch: "master",
-			// 	Image: "qlean-staging",
-			// }
-
 			err = container.Run(dockerClient)
 			if err != nil {
 				http.Error(w, "Failed to start container", http.StatusBadRequest)
@@ -66,7 +60,7 @@ func containerHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			rndr.JSON(w, http.StatusOK, container)
+			rndr.JSON(w, http.StatusOK, true)
 			return
 
 		case "PUT":
@@ -82,11 +76,11 @@ func containerHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			rndr.JSON(w, http.StatusOK, container)
+			rndr.JSON(w, http.StatusOK, true)
 			return
 	}
 
-	http.Error(w, "Failed to remove container", http.StatusNotFound)
+	http.Error(w, "Action not found", http.StatusNotFound)
 }
 
 func main() {
