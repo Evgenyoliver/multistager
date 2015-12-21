@@ -84,6 +84,7 @@ func containerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	go consulWorker()
 	http.HandleFunc("/v1/container", containerHandler)
 	http.ListenAndServe(":8080", nil)
 }
