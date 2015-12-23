@@ -20,9 +20,6 @@ func (container Container) Run(dockerClient *docker.Client) error {
 			},
 			Image: container.Image,
 		},
-		HostConfig: &docker.HostConfig{
-			PublishAllPorts: true,
-		},
 	}
 
 	c, err := dockerClient.CreateContainer(containerOpts)
@@ -30,7 +27,7 @@ func (container Container) Run(dockerClient *docker.Client) error {
 		return err
 	}
 
-	err = dockerClient.StartContainer(c.ID, &docker.HostConfig{})
+	err = dockerClient.StartContainer(c.ID, &docker.HostConfig{PublishAllPorts: true})
 	if err != nil {
 		return err
 	}
