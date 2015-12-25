@@ -1,16 +1,29 @@
 package main
 
-import "github.com/fsouza/go-dockerclient"
+import(
+	"errors"
+
+	"github.com/fsouza/go-dockerclient"
+)
 
 type(
 	Container struct {
-		Key    string `json:"key"`
+		Key    string `json:"key,omitempty"`
 		Branch string `json:"branch"`
 		Image  string `json:"image"`
 	}
 )
 
 func (container Container) Run(dockerClient *docker.Client) error {
+	containersList, err := container.List(dockerClient)
+	if err != nil {
+		return err
+	}
+
+	if len(containersList) >= serverConfig.StagesLimit {
+		return errors.New("Containers limit exceeded")
+	}
+
 	containerOpts := docker.CreateContainerOptions{
 		Name: container.Branch,
 		Config: &docker.Config{
@@ -27,7 +40,12 @@ func (container Container) Run(dockerClient *docker.Client) error {
 		return err
 	}
 
-	err = dockerClient.StartContainer(c.ID, &docker.HostConfig{PublishAllPorts: true})
+	hostConfig := &docker.HostConfig{
+		PublishAllPorts: true,
+		Links: serverConfig.Links,
+	}
+
+	err = dockerClient.StartContainer(c.ID, hostConfig)
 	if err != nil {
 		return err
 	}
@@ -44,18 +62,24 @@ func (container Container) Remove(dockerClient *docker.Client) error {
 	return dockerClient.RemoveContainer(removeOpts)
 }
 
-func (container Container) List(dockerClient *docker.Client) ([]docker.APIContainers, error) {
+func (container Container) List(dockerClient *docker.Client) ([]Container, error) {
 	apiContainers, err := dockerClient.ListContainers(docker.ListContainersOptions{})
 	if err != nil {
-		return apiContainers, err
+		return []Container{}, err
 	}
 
-	for id, cont := range apiContainers {
-		if cont.Image != container.Image {
-			apiContainers[id] = apiContainers[len(apiContainers)-1]
-			apiContainers = apiContainers[:len(apiContainers)-1]
+	containersList := []Container{}
+
+	for _, cont := range apiContainers {
+		if cont.Image == container.Image {
+			containerItem := Container{
+				Branch: cont.Names[0],
+				Image: cont.Image,
+			}
+
+			containersList = append(containersList, containerItem)
 		}
 	}
 
-	return apiContainers, nil
+	return containersList, nil
 }
