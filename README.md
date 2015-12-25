@@ -1,6 +1,8 @@
 # Multistager
 Multistaging orchestrator
 
+## Usage
+
 ### List of running containers
 
 `$ curl -s multistager.service.consul/v1/container?image=qlean-staging | python -m json.tool'`
@@ -16,3 +18,15 @@ Multistaging orchestrator
 ### Stop branch
 
 `$ curl -X DELETE multistager.service.consul/v1/container -d '{"image":"qlean-staging", "key":"<GITHUB_KEY>", "branch":"<GIT_BRANCH>"}'`
+
+## Configuration
+
+### Stages limit
+
+`$ curl localhost:8500/v1/kv/multistager/stages_limit?raw`
+
+### Linked containers (splitted by comma)
+
+*For example: messenger-redis:redis, postgres:postgres*
+
+`$ curl localhost:8500/v1/kv/multistager/links?raw`
