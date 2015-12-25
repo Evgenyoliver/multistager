@@ -2,6 +2,7 @@ package main
 
 import(
 	"errors"
+	"strings"
 
 	"github.com/fsouza/go-dockerclient"
 )
@@ -73,7 +74,7 @@ func (container Container) List(dockerClient *docker.Client) ([]Container, error
 	for _, cont := range apiContainers {
 		if cont.Image == container.Image {
 			containerItem := Container{
-				Branch: cont.Names[0],
+				Branch: strings.Replace(cont.Names[0], "/", "", -1),
 				Image: cont.Image,
 			}
 
