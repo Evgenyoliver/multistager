@@ -1,6 +1,10 @@
 # Multistager
 Multistaging orchestrator
 
+### List of running containers
+
+`$ curl -s localhost:8080/v1/container?image=qlean-staging | python -m json.tool'`
+
 ### Start new branch
 
 `$ curl -X POST multistager.service.consul/v1/container -d '{"image":"qlean-staging", "key":"<GITHUB_KEY>", "branch":"<GIT_BRANCH>"}'`
