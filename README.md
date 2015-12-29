@@ -5,7 +5,7 @@ Multistaging orchestrator
 
 ### List of running containers
 
-`$ curl -s multistager.service.consul/v1/container?image=qlean-staging | python -m json.tool'`
+`$ curl -s multistager.service.consul/v1/container?image=qlean-staging | python -m json.tool`
 
 ### Start new branch
 
