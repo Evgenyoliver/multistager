@@ -9,9 +9,11 @@ import(
 
 type(
 	Container struct {
-		Key    string `json:"key,omitempty"`
-		Branch string `json:"branch"`
-		Image  string `json:"image"`
+		Key             string   `json:"key,omitempty"`
+		Branch          string   `json:"branch"`
+		Image           string   `json:"image"`
+		Flags           []string `json:"flags"`
+		MountFolderPath string   `json:"mount_folder_path,omitempty"`
 	}
 )
 
@@ -43,7 +45,16 @@ func (container Container) Run(dockerClient *docker.Client) error {
 
 	hostConfig := &docker.HostConfig{
 		PublishAllPorts: true,
-		Links: serverConfig.Links,
+		Links:           serverConfig.Links,
+	}
+	for _, flag := range container.Flags {
+		switch flag {
+		case "MountFolder":
+			if len(container.MountFolderPath) < 1 {
+				return errors.New("Mount_folder_path request arg required")
+			}
+			hostConfig.Binds = []string{container.MountFolderPath + ":" + container.MountFolderPath}
+		}
 	}
 
 	err = dockerClient.StartContainer(c.ID, hostConfig)

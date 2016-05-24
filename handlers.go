@@ -94,7 +94,7 @@ func containerHandler(w http.ResponseWriter, r *http.Request) {
 
 			err = container.Run(dockerClient)
 			if err != nil {
-				http.Error(w, "Failed to start container", http.StatusBadRequest)
+				http.Error(w, "Failed to start container: "+err.Error(), http.StatusBadRequest)
 				return
 			}
 

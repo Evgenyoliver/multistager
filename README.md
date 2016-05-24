@@ -30,3 +30,15 @@ Multistaging orchestrator
 *For example: messenger-redis:redis, postgres:postgres*
 
 `$ curl localhost:8500/v1/kv/multistager/links?raw`
+
+### Mount folder to container
+
+`curl -X PUT multistager.service.consul/v1/container -d
+'{
+    "image":"image-name",
+    ...
+    "flags": ["MountFolder"],
+    "mount_folder_path": "/dumps"
+}'`
+
+Bind /dumps folder on host machine with multistager to /dumps in container
