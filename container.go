@@ -1,19 +1,20 @@
 package main
 
-import(
+import (
 	"errors"
 	"strings"
 
 	"github.com/fsouza/go-dockerclient"
 )
 
-type(
+type (
 	Container struct {
-		Key             string   `json:"key,omitempty"`
-		Branch          string   `json:"branch"`
-		Image           string   `json:"image"`
-		Flags           []string `json:"flags"`
-		MountFolderPath string   `json:"mount_folder_path,omitempty"`
+		Key             string            `json:"key,omitempty"`
+		Branch          string            `json:"branch"`
+		Image           string            `json:"image"`
+		Flags           []string          `json:"flags"`
+		MountFolderPath string            `json:"mount_folder_path,omitempty"`
+		Env             map[string]string `json:"env,omitempty"`
 	}
 )
 
@@ -36,6 +37,11 @@ func (container Container) Run(dockerClient *docker.Client) error {
 			},
 			Image: container.Image,
 		},
+	}
+	if len(container.Env) > 0 {
+		for k, v := range container.Env {
+			containerOpts.Config.Env = append(containerOpts.Config.Env, k+"="+v)
+		}
 	}
 
 	c, err := dockerClient.CreateContainer(containerOpts)
@@ -66,8 +72,8 @@ func (container Container) Run(dockerClient *docker.Client) error {
 }
 
 func (container Container) Remove(dockerClient *docker.Client) error {
-	removeOpts := docker.RemoveContainerOptions {
-		ID: container.Branch,
+	removeOpts := docker.RemoveContainerOptions{
+		ID:    container.Branch,
 		Force: true,
 	}
 
@@ -86,7 +92,7 @@ func (container Container) List(dockerClient *docker.Client) ([]Container, error
 		if cont.Image == container.Image {
 			containerItem := Container{
 				Branch: strings.Replace(cont.Names[0], "/", "", -1),
-				Image: cont.Image,
+				Image:  cont.Image,
 			}
 
 			containersList = append(containersList, containerItem)
